@@ -1,6 +1,39 @@
-<?php 
+<?php
 
-    include 'db_connection.php';
+include 'db_connection.php';
+    $errores = ['nombre'=>'','apellido'=>''];
+
+    //Revisar que haya habido un submit
+    if (isset($_POST['submit']))
+    {   
+        //Revisar que los campos no estén vacíos
+        if (empty($_POST['nombre']))
+        {
+            $errores['nombre'] = "Nombre no puede estar vacío";
+        }
+
+        if (empty($_POST['apellido']))
+        {
+            $errores['apellido'] = "Apellido no puede estar vacío";
+        }
+
+        //Redirigir a home si no hay errores
+        if (!array_filter($errores))
+        {
+            $nombres = mysqli_real_escape_string($conn, $_POST['nombre']);
+            $apellidos = mysqli_real_escape_string($conn, $_POST['apellido']);
+
+            $query = "INSERT INTO persona(nombres, apellidos) VALUES('$nombres', '$apellidos')";
+
+            //Guardar a DB
+            if (!mysqli_query($conn, $query))
+            {
+                echo 'Query error: ' . mysqli_error($conn);
+            }
+
+            header('Location: index.php');
+        }
+    }
 
     //Obtener datos de la BD
     $query = 'SELECT * FROM persona ORDER BY apellidos';
@@ -15,7 +48,7 @@
 
     mysqli_free_result($resultado);
 
-?>
+    ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -27,8 +60,25 @@
 <body>
 
     <h2>Tarea 1 - Tópicos Especiales en Ingeniería de Software</h4>
-    
-    <a href="agregar.php">Agregar nombre</a>
+    <form action="index.php" method="POST">
+        <label for="">Nombres:</label>
+        <input type="text" name="nombre" value="">
+        <div class="red-text"><?php echo htmlspecialchars($errores['nombre']) ?></div>
+
+        <br>
+        
+        <label for="">Apellidos:</label>
+        <input type="text" name="apellido" value="">
+        <div class="red-text"><?php echo htmlspecialchars($errores['apellido']) ?></div>
+
+        <br>
+
+        <div class="center">
+            <input type="submit" name="submit" value="Submit">
+        </div>
+    </form>
+
+    <br>
 
     <h4>Nombres registrados</h4>
     <ul>
